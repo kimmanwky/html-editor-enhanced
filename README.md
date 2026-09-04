@@ -703,29 +703,29 @@ import 'package:http/http.dart' as http;
       },
       mediaUploadInterceptor: (PlatformFile file, InsertFileType type) async {
         print(file.name); //filename
-        print(file.size); //size in bytes
-        print(file.extension); //MIME type (e.g. image/jpg)
+        print(file.lengthSync()); //size in bytes
+        print(file.extension); //file extension (e.g. jpg, mp4)
         //either upload to server:
-        if (file.bytes != null && file.name != null) {
+        if (file.name.isNotEmpty) {
           final request = http.MultipartRequest('POST', Uri.parse("your_server_url"));
-          request.files.add(http.MultipartFile.fromBytes("file", file.bytes, filename: file.name)); //your server may require a different key than "file"
+          request.files.add(http.MultipartFile.fromBytes("file", await file.readAsBytes(), filename: file.name)); //your server may require a different key than "file"
           final response = await request.send();
           //try to insert as network image, but if it fails, then try to insert as base64:
           if (response.statusCode == 200) {
-            controller.insertNetworkImage(response.body["url"], filename: file.name!); //where "url" is the url of the uploaded image returned in the body JSON
+            controller.insertNetworkImage(response.body["url"], filename: file.name); //where "url" is the url of the uploaded image returned in the body JSON
           } else {
             if (type == InsertFileType.image) {
-              String base64Data = base64.encode(file.bytes!);
+              String base64Data = base64.encode(await file.readAsBytes());
               String base64Image =
               """<img src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
               controller.insertHtml(base64Image);
             } else if (type == InsertFileType.video) {
-              String base64Data = base64.encode(file.bytes!);
+              String base64Data = base64.encode(await file.readAsBytes());
               String base64Image =
               """<video src="data:video/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
               controller.insertHtml(base64Image);
             } else if (type == InsertFileType.audio) {
-              String base64Data = base64.encode(file.bytes!);
+              String base64Data = base64.encode(await file.readAsBytes());
               String base64Image =
               """<audio src="data:audio/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
               controller.insertHtml(base64Image);
@@ -733,19 +733,19 @@ import 'package:http/http.dart' as http;
           }
         }
         //or insert as base64:
-        if (file.bytes != null) {
+        if (file.name.isNotEmpty) {
           if (type == InsertFileType.image) {
-            String base64Data = base64.encode(file.bytes!);
+            String base64Data = base64.encode(await file.readAsBytes());
             String base64Image =
             """<img src="data:image/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
             controller.insertHtml(base64Image);
           } else if (type == InsertFileType.video) {
-            String base64Data = base64.encode(file.bytes!);
+            String base64Data = base64.encode(await file.readAsBytes());
             String base64Image =
             """<video src="data:video/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
             controller.insertHtml(base64Image);
           } else if (type == InsertFileType.audio) {
-            String base64Data = base64.encode(file.bytes!);
+            String base64Data = base64.encode(await file.readAsBytes());
             String base64Image =
             """<audio src="data:audio/${file.extension};base64,$base64Data" data-filename="${file.name}"/>""";
             controller.insertHtml(base64Image);
