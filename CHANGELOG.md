@@ -1,3 +1,8 @@
+## [2.8.0] = 2026-09-05
+* Upgrade `file_picker` to v12 (`^12.2.0`)
+   * Migrated to the new v12 API: `FilePicker.pickFile()` now returns `PlatformFile?`, `FilePickerResult` was removed, and file bytes are read via `PlatformFile.readAsBytes()`
+* Bump minimum Flutter/Dart versions to 3.38 / 3.10 (required by `file_picker` 12)
+
 ## [2.7.1] = 2025-07-12
 * Update dependencies
 
